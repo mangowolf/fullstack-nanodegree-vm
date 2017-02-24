@@ -6,4 +6,5 @@
 -- You can write comments in this file by starting them with two dashes, like
 -- these lines here.
 
-
+CREATE TABLE players (PlayerID SERIAL, LastName TEXT, FirstName TEXT, 
+					  Match TEXT, Wins INT, time TIMESTAMP DEFAULT CURRENT TIMESTAMP)
