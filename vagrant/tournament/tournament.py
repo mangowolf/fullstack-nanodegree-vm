@@ -48,6 +48,13 @@ def registerPlayer(name):
       name: the player's full name (need not be unique).
     """
 
+    DB = connect()
+    c = DB.cursor()
+    c.execute('INSERT INTO players(name, wins, match, standing) VALUES(%s, %s, %s, %s);',
+              ((name,),(0,),(0,),(0,)))
+    DB.commit()
+    DB.close()
+
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -62,6 +69,12 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    DB = connect()
+    c = DB.cursor()
+    c.execute("SELECT playerid, name, wins, match FROM players ORDER BY wins DESC;")
+    results = c.fetchall()
+    return results
+    DB.close()
 
 
 def reportMatch(winner, loser):

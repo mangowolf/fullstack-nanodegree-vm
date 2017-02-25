@@ -7,4 +7,4 @@
 -- these lines here.
 
 CREATE TABLE players (PlayerID SERIAL, Name TEXT, 
-					  Match INT, Wins INT, Standing INT, time TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+					  Wins INT, Match INT, Standing INT, time TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
