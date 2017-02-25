@@ -71,7 +71,7 @@ def playerStandings():
     """
     DB = connect()
     c = DB.cursor()
-    c.execute("SELECT playerid, name, wins, match FROM players ORDER BY wins DESC;")
+    c.execute('SELECT playerid, name, wins, match FROM players ORDER BY wins DESC;')
     results = c.fetchall()
     return results
     DB.close()
@@ -84,6 +84,17 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
+    conn = connect()
+    c = conn.cursor()
+    c.execute('INSERT INTO matches(winnerID, loserID) VALUES(%s, %s);',((winner,),(loser,)))
+    c.execute('UPDATE players SET wins = wins + 1 WHERE playerID = %s;',(winner,))
+    c.execute('UPDATE players SET match = match + 1 WHERE playerID = %s OR playerID = %s;',((winner,),(loser,)))
+    c.execute('SELECT matchID, winnerID, loserID FROM matches;')
+    conn.commit()
+    results = c.fetchone()
+    conn.close()
+    return results
+
  
  
 def swissPairings():
