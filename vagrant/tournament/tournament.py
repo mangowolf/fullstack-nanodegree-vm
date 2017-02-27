@@ -51,8 +51,8 @@ def registerPlayer(name):
 
     DB = connect()
     c = DB.cursor()
-    c.execute('INSERT INTO players(name, wins, match, standing) VALUES(%s, %s, %s, %s);',
-              ((name,),(0,),(0,),(0,)))
+    c.execute('INSERT INTO players(name, wins, match) VALUES(%s, %s, %s);',
+              ((name,),(0,),(0,)))
     DB.commit()
     DB.close()
 
@@ -95,8 +95,6 @@ def reportMatch(winner, loser):
     results = c.fetchone()
     conn.close()
     return results
-
- 
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -113,5 +111,12 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+    conn = connect()
+    c = conn.cursor()
+    c.execute('SELECT * FROM pairings;')
+    conn.commit()
+    results = c.fetchall()
+    conn.close()
+    return results
 
 
