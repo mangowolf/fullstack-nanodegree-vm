@@ -8,20 +8,32 @@
 
 CREATE DATABASE tournament;
 
-CREATE TABLE players (PlayerID SERIAL PRIMARY KEY, Name TEXT, 
-					  Wins INT, Match INT);
+CREATE TABLE players (PlayerID SERIAL PRIMARY KEY, Name TEXT);
 
 CREATE TABLE matches (matchID SERIAL PRIMARY KEY, winnerID INT REFERENCES players(playerID),
 					  loserID INT REFERENCES players(playerID));
 
-CREATE OR REPLACE VIEW playerRankings AS SELECT PlayerID, name,
-Rank() OVER(ORDER BY Wins DESC), Row_number() OVER(ORDER BY Wins DESC), Wins FROM players;
+CREATE OR REPLACE VIEW playerStats AS SELECT playerid, name, 
+              (SELECT count(*) FROM matches WHERE players.playerid = matches.winnerid) AS wins,
+              (SELECT count(*) FROM matches WHERE players.playerid = matches.winnerid OR 
+              players.playerid = matches.loserid) AS matches
+              FROM players
+              ORDER BY wins DESC;
 
-CREATE OR REPLACE VIEW evenRows AS SELECT PlayerID, name, Rank() OVER(ORDER BY Wins DESC),
-Row_number() OVER(ORDER BY Wins DESC), Wins FROM playerRankings WHERE mod(row_number,2)=0;
+--CREATE OR REPLACE VIEW winnerView AS SELECT count(winnerid) AS wins, winnerid FROM matches GROUP BY winnerid;
 
-CREATE OR REPLACE VIEW oddRows AS SELECT PlayerID, name, Rank() OVER(ORDER BY Wins DESC),
-Row_number() OVER(ORDER BY Wins DESC), Wins FROM playerRankings WHERE mod(row_number,2)=1;
+--CREATE OR REPLACE VIEW matchView AS SELECT winnerid from matches union select loserid from matches;
+
+--CREATE OR REPLACE VIEW countMatchView AS SELECT count(winnerid) AS matchCount, winnerid FROM matchView GROUP BY winnerid;
+
+CREATE OR REPLACE VIEW playerRankings AS SELECT PlayerID, name, wins, matches,
+Rank() OVER(ORDER BY Wins DESC), Row_number() OVER(ORDER BY Wins DESC) FROM playerStats;
+
+CREATE OR REPLACE VIEW evenRows AS SELECT PlayerID, name, wins, matches, Rank() OVER(ORDER BY Wins DESC),
+Row_number() OVER(ORDER BY Wins DESC) FROM playerRankings WHERE mod(row_number,2)=0;
+
+CREATE OR REPLACE VIEW oddRows AS SELECT PlayerID, name, wins, matches, Rank() OVER(ORDER BY Wins DESC),
+Row_number() OVER(ORDER BY Wins DESC) FROM playerRankings WHERE mod(row_number,2)=1;
 
 CREATE OR REPLACE VIEW pairings AS SELECT oddRows.playerID AS p1, oddRows.name AS p1_Name, 
                 evenRows.playerID AS p2, evenRows.name AS p2_Name FROM oddRows, evenRows
