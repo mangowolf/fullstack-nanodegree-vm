@@ -15,7 +15,6 @@ def deleteMatches():
     """Remove all the match records from the database."""
     DB = connect()
     c = DB.cursor()
-    c.execute("UPDATE players SET match = 0, wins = 0;")
     c.execute('TRUNCATE matches;')
     DB.commit()
     DB.close()
@@ -25,7 +24,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     DB = connect()
     c = DB.cursor()
-    c.execute("DELETE FROM players;")
+    c.execute("TRUNCATE players CASCADE;")
     DB.commit()
     DB.close()
 
@@ -85,7 +84,7 @@ def reportMatch(winner, loser):
     """
     db = connect()
     c = db.cursor()
-    c.execute('INSERT INTO matches(winnerID, loserID) VALUES(%s, %s);',((winner,),(loser,)))
+    c.execute('INSERT INTO matches(winnerID, loserID) VALUES(%s, %s);',(winner,loser))
     c.execute('SELECT winnerID, loserID FROM matches;')
     db.commit()
     results = c.fetchone()
