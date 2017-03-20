@@ -25,12 +25,64 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+## Temporary Fake Data
+category = {'name': 'Basketball', 'id': '1'}
+
+categories = [{'name': 'Basketball', 'id': '1'}, {'name': 'Baseball', 'id': '2'}, {'name': 'Football', 'id': '3'},
+			  {'name': 'Soccer', 'id': '3'}, {'name': 'Tennis', 'id': '4'}]
+
+items = [{'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
+		  'id': '1'}, {'name':'Sleeves', 'description':'Sleeve guards for high performance and support.',
+		  'price':'40.00', 'id':'2'}, {'name': 'Nike_Air_Jordans', 'description':'Original Air Jordans.',
+		  'price':'500.00', 'id':'3'}]
+
+item = {'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
+		  'id': '1'}
+
+
 # Show all categories
 @app.route('/')
 @app.route('/category/')
 def showCategories():
 	#categories = session.query(Category).order_by(asc(Category.name))
-	return 'Hello World!'
+	return render_template('publicCategories.html', categories=categories)
+
+# Add a new category
+@app.route('/category/new')
+def addCategory():
+	return render_template('newCategory.html')
+
+# Edit a category
+@app.route('/category/<int:category_id>/edit')
+def editCategory(category_id):
+	return render_template('editCategory.html', category_id=category_id)
+
+# Delete a category
+@app.route('/category/<int:category_id>/delete')
+def delCategory(category_id):
+	return render_template('delCategory.html', category_id=category_id)
+
+# Show all items in category
+@app.route('/category/<int:category_id>/')
+def showCategoryItems(category_id):
+	return render_template('publicItems.html', category_id=category_id, items=items)
+
+# Display item details
+@app.route('/category/<int:category_id>/<int:item_id>/')
+def showItem(category_id, item_id):
+	return render_template('itemDetails.html', category_id=category_id, item_id=item_id)
+
+# Edit a category item
+@app.route('/category/<int:category_id>/<int:item_id>/edit')
+def editCategoryItem(category_id, item_id):
+	return render_template('editItem.html', category_id=category_id, item_id=item_id)
+
+# Delete a category item
+@app.route('/category/<int:category_id>/<int:item_id>/delete')
+def delCategoryItem(category_id, item_id):
+	return render_template('delItem.html', category_id=category_id, item_id=item_id)
+
+
 
 
 if __name__ == '__main__':
