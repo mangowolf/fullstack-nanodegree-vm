@@ -65,7 +65,14 @@ def delCategory(category_id):
 # Show all items in category
 @app.route('/category/<int:category_id>/')
 def showCategoryItems(category_id):
-	return render_template('publicItems.html', category_id=category_id, items=items)
+	#try:
+		#lang = request.args.get('cat_name', type=str)
+	return jsonify(result=item)
+		#else:
+			#return jsonify(result='no items for this category')
+	#except Exception as e:
+		#return str(e)
+		#return render_template('publicCategories.html', category_id=category_id, items=items)
 
 # Display item details
 @app.route('/category/<int:category_id>/<int:item_id>/')
