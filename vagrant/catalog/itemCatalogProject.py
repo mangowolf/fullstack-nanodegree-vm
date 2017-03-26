@@ -29,12 +29,15 @@ session = DBSession()
 category = {'name': 'Basketball', 'id': '1'}
 
 categories = [{'name': 'Basketball', 'id': '1'}, {'name': 'Baseball', 'id': '2'}, {'name': 'Football', 'id': '3'},
-			  {'name': 'Soccer', 'id': '3'}, {'name': 'Tennis', 'id': '4'}]
+			  {'name': 'Soccer', 'id': '4'}, {'name': 'Tennis', 'id': '5'}]
 
 items = [{'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
-		  'id': '1'}, {'name':'Sleeves', 'description':'Sleeve guards for high performance and support.',
+		  'id':'1'}, {'name':'Sleeves', 'description':'Sleeve guards for high performance and support.',
 		  'price':'40.00', 'id':'2'}, {'name': 'Nike_Air_Jordans', 'description':'Original Air Jordans.',
-		  'price':'500.00', 'id':'3'}]
+		  'price':'500.00', 'id':'1'}, {'name':'Kleets', 'description':'Standard issue Soccer Kleets',
+		  'price':'90.00', 'id':'4'}, {'name':'Racket', 'description':'Standard racket', 'price':'40.00', 'id':'5'},
+		  {'name':'Football pigskin', 'description':'Standard pigskin', 'price':'60.00','id':'3'}, {'name':'Tennis Balls',
+		  'description':'Standard issue Tennis Balls', 'price':'10.00','id':'5'}]
 
 item = {'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
 		  'id': '1'}
@@ -45,6 +48,7 @@ item = {'name':'Wilson_Basketball', 'description':'Standard issue basketball rel
 @app.route('/category/')
 def showCategories():
 	#categories = session.query(Category).order_by(asc(Category.name))
+
 	return render_template('publicCategories.html', categories=categories)
 
 # Add a new category
@@ -67,12 +71,22 @@ def delCategory(category_id):
 def showCategoryItems(category_id):
 	#try:
 		#lang = request.args.get('cat_name', type=str)
-	return jsonify(result=item)
+	#return jsonify(result=item)
 		#else:
 			#return jsonify(result='no items for this category')
 	#except Exception as e:
 		#return str(e)
 		#return render_template('publicCategories.html', category_id=category_id, items=items)
+	#data = []
+	def data_transmitter():
+		catItem = []
+		for i in items:
+			if category_id == int(i['id']):
+				catItem.append(i['name'])
+		return catItem
+	data = data_transmitter()
+	return render_template('publicCategories.html', categories=categories, item=data)
+
 
 # Display item details
 @app.route('/category/<int:category_id>/<int:item_id>/')
