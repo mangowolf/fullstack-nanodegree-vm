@@ -26,12 +26,12 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 ## Temporary Fake Data
-category = {'name': 'Basketball', 'id': '1'}
+#category = {'name': 'Basketball', 'id': '1'}
 
-categories = [{'name': 'Basketball', 'id': '1'}, {'name': 'Baseball', 'id': '2'}, {'name': 'Football', 'id': '3'},
-			  {'name': 'Soccer', 'id': '4'}, {'name': 'Tennis', 'id': '5'}]
+#categories = [{'name': 'Basketball', 'id': '1'}, {'name': 'Baseball', 'id': '2'}, {'name': 'Football', 'id': '3'},
+#			  {'name': 'Soccer', 'id': '4'}, {'name': 'Tennis', 'id': '5'}]
 
-items = [{'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
+'''items = [{'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
 		  'id':'1'}, {'name':'Sleeves', 'description':'Sleeve guards for high performance and support.',
 		  'price':'40.00', 'id':'2'}, {'name': 'Nike_Air_Jordans', 'description':'Original Air Jordans.',
 		  'price':'500.00', 'id':'1'}, {'name':'Kleets', 'description':'Standard issue Soccer Kleets',
@@ -41,20 +41,30 @@ items = [{'name':'Wilson_Basketball', 'description':'Standard issue basketball r
 
 item = {'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
 		  'id': '1'}
-
+'''
+## Session Commit Convenience Function
+def commitSession(argument):
+	session.add(argument)
+	session.commit()
 
 # Show all categories
 @app.route('/')
 @app.route('/category/')
 def showCategories():
-	#categories = session.query(Category).order_by(asc(Category.name))
+	categories = session.query(Category).order_by(asc(Category.name))
 
 	return render_template('publicCategories.html', categories=categories)
 
 # Add a new category
-@app.route('/category/new')
+@app.route('/category/new', methods=['GET', 'POST'])
 def addCategory():
-	return render_template('newCategory.html')
+	if request.method == 'POST':
+		newCategory = Category(name=request.form['name'])
+		commitSession(newCategory)
+		displayCategory = session.query(Category).order_by(Category.id.desc()).first()
+		return render_template('newCategory.html', newCategory=displayCategory.name)
+	else:
+		return render_template('newCategory.html')
 
 # Edit a category
 @app.route('/category/<int:category_id>/edit')
@@ -69,27 +79,32 @@ def delCategory(category_id):
 # Show all items in category
 @app.route('/category/<int:category_id>/')
 def showCategoryItems(category_id):
-	#try:
-		#lang = request.args.get('cat_name', type=str)
-	#return jsonify(result=item)
-		#else:
-			#return jsonify(result='no items for this category')
-	#except Exception as e:
-		#return str(e)
-		#return render_template('publicCategories.html', category_id=category_id, items=items)
-	#data = []
+	items = session.query(Item).filter_by(category_id=category_id).all()
+	categories = session.query(Category).order_by(asc(Category.name))
 	def data_transmitter():
 		catItem = []
-		for i in items:
-			if category_id == int(i['id']):
-				catItem.append(i['name'])
+		for item in items:
+			catItem.append(item.name)
+			#if category_id == int(i['id']):
+			#	catItem.append(i['name'])
 		return catItem
 	data = data_transmitter()
 	return render_template('publicCategories.html', categories=categories, item=data)
 
 
 # Display item details
-@app.route('/category/<int:category_id>/<int:item_id>/')
+@app.route('/category/<int:category_id>/new', methods=['GET','POST'])
+def addItem(category_id):
+	if request.method == 'POST':
+		newItem = Item(name=request.form['name'], description=request.form['description'],
+			price=request.form['price'], category_id=category_id)
+		commitSession(newItem)
+		displayItem = session.query(Item).order_by(Item.id.desc()).first()
+		return render_template('newItem.html', category_id=category_id, newItem=displayItem.name)
+	else:
+		return render_template('newItem.html', category_id=category_id)
+
+@app.route('/category/<int:category_id>/<int:item_id>')
 def showItem(category_id, item_id):
 	return render_template('itemDetails.html', category_id=category_id, item_id=item_id)
 
@@ -107,6 +122,6 @@ def delCategoryItem(category_id, item_id):
 
 
 if __name__ == '__main__':
-	#app.secret_key = 'super_secret_key'
+	app.secret_key = 'super_secret_key'
 	app.debug = True
 	app.run(host='0.0.0.0', port=1234)

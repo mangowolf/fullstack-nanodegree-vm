@@ -5,9 +5,11 @@
 	<h2>Add a New Category</h2>
 
 	<label>Category Name:</label>
-	<form action="#">
-		<input type=text>
-		<input type=submit value=Add>
+	<form action="{{url_for('addCategory')}}" method="POST">
+		<input type="text" name="name">
+		<button type="submit" value="Add">
 	</form>
-
+	{% if newCategory %}
+		{{newCategory}} has been added as a Category.
+	{% endif %}
 {% endblock %}
