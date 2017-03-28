@@ -25,23 +25,6 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-## Temporary Fake Data
-#category = {'name': 'Basketball', 'id': '1'}
-
-#categories = [{'name': 'Basketball', 'id': '1'}, {'name': 'Baseball', 'id': '2'}, {'name': 'Football', 'id': '3'},
-#			  {'name': 'Soccer', 'id': '4'}, {'name': 'Tennis', 'id': '5'}]
-
-'''items = [{'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
-		  'id':'1'}, {'name':'Sleeves', 'description':'Sleeve guards for high performance and support.',
-		  'price':'40.00', 'id':'2'}, {'name': 'Nike_Air_Jordans', 'description':'Original Air Jordans.',
-		  'price':'500.00', 'id':'1'}, {'name':'Kleets', 'description':'Standard issue Soccer Kleets',
-		  'price':'90.00', 'id':'4'}, {'name':'Racket', 'description':'Standard racket', 'price':'40.00', 'id':'5'},
-		  {'name':'Football pigskin', 'description':'Standard pigskin', 'price':'60.00','id':'3'}, {'name':'Tennis Balls',
-		  'description':'Standard issue Tennis Balls', 'price':'10.00','id':'5'}]
-
-item = {'name':'Wilson_Basketball', 'description':'Standard issue basketball released by NBA.', 'price': '20.00',
-		  'id': '1'}
-'''
 ## Session Commit Convenience Function
 def commitSession(argument):
 	session.add(argument)
@@ -67,9 +50,15 @@ def addCategory():
 		return render_template('newCategory.html')
 
 # Edit a category
-@app.route('/category/<int:category_id>/edit')
+@app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
-	return render_template('editCategory.html', category_id=category_id)
+	if request.method == "POST":
+		editItem = session.query(Category).filter_by(id=category_id).first()
+		editItem.name = request.form['name']
+		flash('Category updated to new name, %s' % editItem.name)
+		return redirect(url_for('showCategories'))
+	else:
+		return render_template('editCategory.html', category_id=category_id)
 
 # Delete a category
 @app.route('/category/<int:category_id>/delete')
@@ -85,14 +74,12 @@ def showCategoryItems(category_id):
 		catItem = []
 		for item in items:
 			catItem.append(item.name)
-			#if category_id == int(i['id']):
-			#	catItem.append(i['name'])
 		return catItem
 	data = data_transmitter()
 	return render_template('publicCategories.html', categories=categories, item=data)
 
 
-# Display item details
+# Add a new Item
 @app.route('/category/<int:category_id>/new', methods=['GET','POST'])
 def addItem(category_id):
 	if request.method == 'POST':
