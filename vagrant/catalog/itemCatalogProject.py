@@ -56,6 +56,7 @@ def editCategory(category_id):
 		editItem = session.query(Category).filter_by(id=category_id).first()
 		editItem.name = request.form['name']
 		flash('Category updated to new name, %s' % editItem.name)
+		commitSession(editItem)
 		return redirect(url_for('showCategories'))
 	else:
 		return render_template('editCategory.html', category_id=category_id)
@@ -114,6 +115,7 @@ def editCategoryItem(category_id, item_id):
 		itemToEdit.name = request.form['name']
 		itemToEdit.price = request.form['price']
 		itemToEdit.description = request.form['description']
+		commitSession(itemToEdit)
 		return redirect(url_for('showCategories'))
 	else:
 		return render_template('editItem.html', category_id=category_id, item_id=item_id)
@@ -121,7 +123,13 @@ def editCategoryItem(category_id, item_id):
 # Delete a category item
 @app.route('/category/<int:category_id>/<int:item_id>/delete', methods=['GET', 'POST'])
 def delCategoryItem(category_id, item_id):
-	return render_template('delItem.html', category_id=category_id, item_id=item_id)
+	if request.method == "POST":
+		itemToDel = session.query(Item).filter_by(id=item_id).one()
+		session.delete(itemToDel)
+		session.commit()
+		return redirect(url_for('showCategory'))
+	else:
+		return render_template('delItem.html', category_id=category_id, item_id=item_id)
 
 
 
