@@ -61,9 +61,16 @@ def editCategory(category_id):
 		return render_template('editCategory.html', category_id=category_id)
 
 # Delete a category
-@app.route('/category/<int:category_id>/delete')
+@app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def delCategory(category_id):
-	return render_template('delCategory.html', category_id=category_id)
+	catToDel = session.query(Category).filter_by(id=category_id).one()
+	if request.method == "POST":
+		session.delete(catToDel)
+		flash('%s successfully deleted' % catToDel.name)
+		session.commit()
+		return redirect(url_for('showCategories'))
+	else:
+		return render_template('delCategory.html', category_id=category_id)
 
 # Show all items in category
 @app.route('/category/<int:category_id>/')
@@ -73,7 +80,7 @@ def showCategoryItems(category_id):
 	def data_transmitter():
 		catItem = []
 		for item in items:
-			catItem.append(item.name)
+			catItem.append(item)
 		return catItem
 	data = data_transmitter()
 	return render_template('publicCategories.html', categories=categories, item=data)
@@ -93,7 +100,10 @@ def addItem(category_id):
 
 @app.route('/category/<int:category_id>/<int:item_id>')
 def showItem(category_id, item_id):
-	return render_template('itemDetails.html', category_id=category_id, item_id=item_id)
+	itemDetails = session.query(Item).filter_by(id=item_id).one()
+
+	return render_template('itemDetails.html', category_id=category_id, item_id=item_id, 
+		item_details=itemDetails)
 
 # Edit a category item
 @app.route('/category/<int:category_id>/<int:item_id>/edit')
