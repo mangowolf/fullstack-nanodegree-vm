@@ -31,8 +31,8 @@
 	</script>
 {% endblock %}
 {% block content %}
-
-	PublicCategories!
+{% include "header.html" %}
+	<h2>Public Categories</h2>
 	{% for category in categories %}
 		<a href="{{url_for('showCategoryItems', category_id=category.id)}}" id='category_name' data-name="{{category.id}}">
 			<h3>{{category.name}}</h3>

@@ -14,9 +14,9 @@ import requests
 
 app = Flask(__name__)
 
-#CLIENT_ID = json.loads(
-#	open('client_secrets.json', 'r').read())['web']['client_id']
-#APPLICATION_NAME = "Item Catalog Application"
+CLIENT_ID = json.loads(
+	open('client_secrets.json', 'r').read())['web']['client_id']
+APPLICATION_NAME = "Item Catalog Application"
 
 # Connect to database and create database session
 engine = create_engine('sqlite:///itemcatalog.db')
@@ -24,6 +24,24 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+# Create anti-forgery state token
+@app.route('/login')
+def showLogin():
+	state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+					for x in xrange(32))
+	login_session['state'] = state
+	return render_template('login.html', STATE=state)
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+	#Validate state token
+	if request.args.get('state') != login_session['state']:
+		response = make_response(json.dumps('Invalid state parameter.'), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	#Obtain authorization code
+	code = request.data
 
 ## Session Commit Convenience Function
 def commitSession(argument):
@@ -56,6 +74,7 @@ def editCategory(category_id):
 		editItem = session.query(Category).filter_by(id=category_id).first()
 		editItem.name = request.form['name']
 		flash('Category updated to new name, %s' % editItem.name)
+		commitSession(editItem)
 		return redirect(url_for('showCategories'))
 	else:
 		return render_template('editCategory.html', category_id=category_id)
@@ -98,22 +117,37 @@ def addItem(category_id):
 	else:
 		return render_template('newItem.html', category_id=category_id)
 
+
+# View Item Details
 @app.route('/category/<int:category_id>/<int:item_id>')
 def showItem(category_id, item_id):
 	itemDetails = session.query(Item).filter_by(id=item_id).one()
-
 	return render_template('itemDetails.html', category_id=category_id, item_id=item_id, 
 		item_details=itemDetails)
 
 # Edit a category item
-@app.route('/category/<int:category_id>/<int:item_id>/edit')
+@app.route('/category/<int:category_id>/<int:item_id>/edit', methods=['GET', 'POST'])
 def editCategoryItem(category_id, item_id):
-	return render_template('editItem.html', category_id=category_id, item_id=item_id)
+	if request.method == "POST":
+		itemToEdit = session.query(Item).filter_by(id=item_id).one()
+		itemToEdit.name = request.form['name']
+		itemToEdit.price = request.form['price']
+		itemToEdit.description = request.form['description']
+		commitSession(itemToEdit)
+		return redirect(url_for('showCategories'))
+	else:
+		return render_template('editItem.html', category_id=category_id, item_id=item_id)
 
 # Delete a category item
-@app.route('/category/<int:category_id>/<int:item_id>/delete')
+@app.route('/category/<int:category_id>/<int:item_id>/delete', methods=['GET', 'POST'])
 def delCategoryItem(category_id, item_id):
-	return render_template('delItem.html', category_id=category_id, item_id=item_id)
+	if request.method == "POST":
+		itemToDel = session.query(Item).filter_by(id=item_id).one()
+		session.delete(itemToDel)
+		session.commit()
+		return redirect(url_for('showCategory'))
+	else:
+		return render_template('delItem.html', category_id=category_id, item_id=item_id)
 
 
 
