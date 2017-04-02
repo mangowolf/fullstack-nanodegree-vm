@@ -14,9 +14,9 @@ import requests
 
 app = Flask(__name__)
 
-#CLIENT_ID = json.loads(
-#	open('client_secrets.json', 'r').read())['web']['client_id']
-#APPLICATION_NAME = "Item Catalog Application"
+CLIENT_ID = json.loads(
+	open('client_secrets.json', 'r').read())['web']['client_id']
+APPLICATION_NAME = "Item Catalog Application"
 
 # Connect to database and create database session
 engine = create_engine('sqlite:///itemcatalog.db')
@@ -24,6 +24,24 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+# Create anti-forgery state token
+@app.route('/login')
+def showLogin():
+	state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+					for x in xrange(32))
+	login_session['state'] = state
+	return render_template('login.html', STATE=state)
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+	#Validate state token
+	if request.args.get('state') != login_session['state']:
+		response = make_response(json.dumps('Invalid state parameter.'), 401)
+		response.headers['Content-Type'] = 'application/json'
+		return response
+	#Obtain authorization code
+	code = request.data
 
 ## Session Commit Convenience Function
 def commitSession(argument):

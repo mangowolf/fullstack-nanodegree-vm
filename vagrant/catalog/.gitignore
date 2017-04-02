@@ -39,3 +39,10 @@ Thumbs.db
 # Vagrant Files #
 ######################
 .vagrant/*
+
+# Secrets #
+client_secrets.json
+fb_client_secrets.json
+
+# Python #
+*.pyc
