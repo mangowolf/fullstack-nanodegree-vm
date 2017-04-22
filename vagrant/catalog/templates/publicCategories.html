@@ -32,21 +32,24 @@
 {% endblock %}
 {% block content %}
 {% include "header.html" %}
-	<h2>Public Categories</h2>
+<div class="container main-background">
 	<div class="row">
-	<div class="col-md-4">
-		{% for category in categories %}
-			<a href="{{url_for('showCategoryItems', category_id=category.id)}}" id='category_name' data-name="{{category.id}}">
-				<h3>{{category.name}}</h3>
+		<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+			<h3>Public Categories</h3>
+			{% for category in categories %}
+				<a href="{{url_for('showCategoryItems', category_id=category.id)}}" id='category_name' data-name="{{category.id}}">
+					<h3>{{category.name}}</h3>
+				</a>
+			{% endfor %}
+		</div>
+		<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+		<h3>Items</h3><br>
+		{% for catItem in item %}
+			<a href="{{url_for('showItem', category_id=catItem.category_id, item_id=catItem.id)}}" id="item_name" data-name="{{catItem.id}}">
+				<h4>{{catItem.name}}</h4><br>
 			</a>
 		{% endfor %}
-	</div>
-	<div class="col-md-8">
-	{% for catItem in item %}
-		<a href="{{url_for('showItem', category_id=catItem.category_id, item_id=catItem.id)}}" id="item_name" data-name="{{catItem.id}}">
-			<h4>{{catItem.name}}</h4><br>
-		</a>
-	{% endfor %}
+		</div>
 	</div>
 </div>
 {% endblock %}
