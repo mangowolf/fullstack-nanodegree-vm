@@ -264,6 +264,23 @@ def clearSession():
   login_session.clear()
   return "Session Cleared"
 
+# JSON API'S to view Category Information
+@app.route('/category/<int:category_id>/JSON')
+def categoryJSON(category_id):
+	category = session.query(Category).filter_by(id=category_id).one()
+	items = session.query(Item).filter_by(category_id=category_id).all()
+	return jsonify(Items=[i.serialize for i in items])
+
+@app.route('/category/<int:category_id>/<int:item_id>/JSON')
+def itemJSON(category_id, item_id):
+	category_item = session.query(Item).filter_by(id=item_id).one()
+	return jsonify(category_item=category_item.serialize)
+
+@app.route('/category/JSON')
+def categoriesJSON():
+	categories = session.query(Category).all()
+	return jsonify(categories=[c.serialize for c in categories])
+
 # Show all categories
 @app.route('/')
 @app.route('/category/')
@@ -271,9 +288,9 @@ def showCategories():
 	categories = session.query(Category).order_by(asc(Category.name))
 	latest_items = session.query(Item).order_by(desc(Item.id)).limit(10)
 	if 'username' not in login_session:
-		return render_template('index.html', categories=categories, item=latest_items)
+		return render_template('publicIndex.html', categories=categories, item=latest_items)
 	else:
-		return render_template('categories.html', categories=categories)
+		return render_template('index.html', categories=categories, item=latest_items)
 
 # Add a new category
 @app.route('/category/new', methods=['GET', 'POST'])
@@ -388,8 +405,27 @@ def delCategoryItem(category_id, item_id):
 	else:
 		return render_template('delItem.html', category_id=category_id, item_id=item_id)
 
-
-
+# Disconnect based on provider
+@app.route('/disconnect')
+def disconnect():
+	if 'provider' in login_session:
+		if login_session['provider'] == 'google':
+			gdisconnect()
+			#del login_session['gplus_id']
+			#del login_session['credentials']
+		if login_session['provider'] == 'facebook':
+			fbdisconnect()
+			del login_session['facebook_id']
+		#del login_session['username']
+		#del login_session['email']
+		#del login_session['picture']
+		#del login_session['user_id']
+		del login_session['provider']
+		flash("You have successfully been logged out.")
+		return redirect(url_for('showCategories'))
+	else:
+		flash("You were not logged in")
+		return redirect(url_for('showCategories'))
 
 if __name__ == '__main__':
 	app.secret_key = 'super_secret_key'
