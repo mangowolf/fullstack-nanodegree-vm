@@ -44,7 +44,7 @@
 			{% endfor %}
 		</div>
 		<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-			<h3>Items</h3><br>
+			<h3>Latest Items</h3><br>
 			{% for catItem in item %}
 				<a href="{{url_for('showItem', category_id=catItem.category_id, item_id=catItem.id)}}" id="item_name" data-name="{{catItem.id}}">
 					<h4>{{catItem.name}}</h4><br>

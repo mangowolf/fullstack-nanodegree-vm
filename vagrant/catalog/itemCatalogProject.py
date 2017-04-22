@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item, User
 from flask import session as login_session
@@ -269,8 +269,9 @@ def clearSession():
 @app.route('/category/')
 def showCategories():
 	categories = session.query(Category).order_by(asc(Category.name))
+	latest_items = session.query(Item).order_by(desc(Item.id)).limit(10)
 	if 'username' not in login_session:
-		return render_template('publicCategories.html', categories=categories)
+		return render_template('index.html', categories=categories, item=latest_items)
 	else:
 		return render_template('categories.html', categories=categories)
 
