@@ -1,44 +1,44 @@
 <!--Main Template Page for Item Catalog App-->
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		{% block head %}
-		<link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
-		  <!-- Bootstrap CSS CDN -->
-		<link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='styles.css') }}">
-		<title>{% block title %}{% endblock %} - Item Catalog</title>
+    <head>
+        {% block head %}
+        <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css'>
+          <!-- Bootstrap CSS CDN -->
+        <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='styles.css') }}">
+        <title>{% block title %}{% endblock %} - Item Catalog</title>
 
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,
-		user-scalable=no">
-		{% endblock %}
-	</head>
-	<body class="body-background">
-	  <!-- APP CONTENT -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,
+        user-scalable=no">
+        {% endblock %}
+    </head>
+    <body class="body-background">
+      <!-- APP CONTENT -->
 
-	  <!-- jQuery CDN -->
-	  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-	  <!-- jQuery local fallback -->
-	  <script>window.jQuery || document.write('<script src="/local/jquery.min.js"><\/script>')</script>
-	  <!-- Bootstrap JS CDN -->
-	  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"></script>
-	  <!-- Bootstrap JS local fallback -->
-	  <script>if(typeof($.fn.modal) === 'undefined') {document.write('<script src="/local/bootstrap.min.js"><\/script>')}</script>
-	  <!-- Bootstrap CSS local fallback -->
-	  <div id="bootstrapCssTest" class="hidden"></div>
-	  <script>
-	    $(function() {
-	      if ($('#bootstrapCssTest').is(':visible')) {
-	        $("head").prepend('<link rel="stylesheet" href="/local/bootstrap.min.css">');
-	      }
-	    });
-	  </script>
-		{% block body %}
-				{% block content %}
-				{% endblock %}
-			</div>
-		{% endblock %}
-	</body>
+      <!-- jQuery CDN -->
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+      <!-- jQuery local fallback -->
+      <script>window.jQuery || document.write('<script src="/local/jquery.min.js"><\/script>')</script>
+      <!-- Bootstrap JS CDN -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"></script>
+      <!-- Bootstrap JS local fallback -->
+      <script>if(typeof($.fn.modal) === 'undefined') {document.write('<script src="/local/bootstrap.min.js"><\/script>')}</script>
+      <!-- Bootstrap CSS local fallback -->
+      <div id="bootstrapCssTest" class="hidden"></div>
+      <script>
+        $(function() {
+          if ($('#bootstrapCssTest').is(':visible')) {
+            $("head").prepend('<link rel="stylesheet" href="/local/bootstrap.min.css">');
+          }
+        });
+      </script>
+        {% block body %}
+                {% block content %}
+                {% endblock %}
+            </div>
+        {% endblock %}
+    </body>
 </html>
