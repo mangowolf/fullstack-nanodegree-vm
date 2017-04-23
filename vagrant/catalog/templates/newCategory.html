@@ -1,15 +1,19 @@
 {% extends "main.html" %}
 {% block content %}
 {% include "header.html" %}
-
-	<h2>Add a New Category</h2>
-
-	<label>Category Name:</label>
-	<form action="{{url_for('addCategory')}}" method="POST">
-		<input type="text" name="name">
-		<button type="submit" value="Add">
-	</form>
-	{% if newCategory %}
-		{{newCategory}} has been added as a Category.
-	{% endif %}
+	<div>
+		<h2>Add a New Category</h2>
+	</div>
+	<div>
+		<label>Category Name:</label>
+		<form action="{{url_for('addCategory')}}" method="POST">
+			<input type="text" name="name">
+			<input type="submit" value="Add">
+		</form>
+	</div>
+	<div>
+		{% if newCategory %}
+			{{newCategory}} has been added as a Category.
+		{% endif %}
+	</div>
 {% endblock %}
