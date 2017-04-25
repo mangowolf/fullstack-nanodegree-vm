@@ -11,6 +11,7 @@ import httplib2
 import json
 from flask import make_response
 import requests
+import sys
 
 app = Flask(__name__)
 
@@ -88,7 +89,6 @@ def fbconnect():
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
-
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
@@ -300,9 +300,16 @@ def addCategory():
         return redirect('/login')
     if request.method == 'POST':
         newCategory = Category(name=request.form['name'])
-        commitSession(newCategory)
+        allCat = session.query(Category).order_by(asc(Category.name))
+        print "Hello World"
+        for c in allCat:
+            print >> sys.stdout, c.name
+            if newCategory == c.name:
+                flash('Category already exists, please enter new category')
+                return render_template('newCategory.html')
+        #commitSession(newCategory)
         displayCategory = session.query(Category).order_by(Category.id.desc()).first()
-        return render_template('newCategory.html', newCategory=displayCategory.name)
+        return render_template('newCategory.html', newCategory=displayCategory.name, test=allCat)
     else:
         return render_template('newCategory.html')
 

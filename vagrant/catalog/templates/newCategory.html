@@ -15,5 +15,8 @@
         {% if newCategory %}
             {{newCategory}} has been added as a Category.
         {% endif %}
+        {% for t in test %}
+            {{t.name}}
+        {% endfor %}
     </div>
 {% endblock %}
