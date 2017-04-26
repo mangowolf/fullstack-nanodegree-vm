@@ -302,7 +302,7 @@ def addCategory():
         newCategory = Category(name=request.form['name'])
         commitSession(newCategory)
         displayCategory = session.query(Category).order_by(Category.id.desc()).first()
-        return render_template('newCategory.html', newCategory=displayCategory.name, test=allCat)
+        return render_template('newCategory.html', newCategory=displayCategory.name)
     else:
         return render_template('newCategory.html')
 
