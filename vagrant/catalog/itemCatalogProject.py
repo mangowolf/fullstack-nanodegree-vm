@@ -300,14 +300,7 @@ def addCategory():
         return redirect('/login')
     if request.method == 'POST':
         newCategory = Category(name=request.form['name'])
-        allCat = session.query(Category).order_by(asc(Category.name))
-        print "Hello World"
-        for c in allCat:
-            print >> sys.stdout, c.name
-            if newCategory == c.name:
-                flash('Category already exists, please enter new category')
-                return render_template('newCategory.html')
-        #commitSession(newCategory)
+        commitSession(newCategory)
         displayCategory = session.query(Category).order_by(Category.id.desc()).first()
         return render_template('newCategory.html', newCategory=displayCategory.name, test=allCat)
     else:

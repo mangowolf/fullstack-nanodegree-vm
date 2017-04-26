@@ -1,6 +1,11 @@
 {% extends "main.html" %}
 {% block content %}
 {% include "header.html" %}
+<div class="container">
+<div class="row">
+<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1">
+</div>
+<div class="col-xs-11 col-sm-11 col-md-11 col-lg-11">
     <h3>Add a new item</h3>
     <div>
         <form action="#" method="POST">
@@ -18,4 +23,7 @@
     {% if newItem %}
         {{newItem}} was added!
     {% endif %}
+</div>
+</div>
+</div>
 {% endblock %}
