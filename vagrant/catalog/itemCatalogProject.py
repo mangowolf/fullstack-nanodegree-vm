@@ -288,10 +288,11 @@ def categoriesJSON():
 def showCategories():
     categories = session.query(Category).order_by(asc(Category.name))
     latest_items = session.query(Item).order_by(desc(Item.id)).limit(10)
+    users = session.query(User).all()
     if 'username' not in login_session:
         return render_template('publicIndex.html', categories=categories, item=latest_items)
     else:
-        return render_template('index.html', categories=categories, item=latest_items)
+        return render_template('index.html', categories=categories, item=latest_items, users=users)
 
 # Add a new category
 @app.route('/category/new', methods=['GET', 'POST'])
@@ -299,7 +300,7 @@ def addCategory():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        newCategory = Category(name=request.form['name'])
+        newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
         commitSession(newCategory)
         displayCategory = session.query(Category).order_by(Category.id.desc()).first()
         return render_template('newCategory.html', newCategory=displayCategory.name)
@@ -311,6 +312,8 @@ def addCategory():
 def editCategory(category_id):
     
     editedCategory = session.query(Category).filter_by(id=category_id).one()
+    print str(editedCategory.user_id)
+    print login_session['user_id']
     if 'username' not in login_session:
         return redirect('/login')
     if editedCategory.user_id != login_session['user_id']:

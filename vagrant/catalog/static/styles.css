@@ -49,3 +49,10 @@
     background-color: white;
     margin-top: 20px;
 }
+
+.add-cat-box {
+    border: 1px solid black;
+    background-color: white;
+    margin-top:20px;
+    padding-bottom: 10px;
+}

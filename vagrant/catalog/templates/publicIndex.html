@@ -1,35 +1,6 @@
 <!--Categories page displaying all item categories-->
 
 {% extends "main.html" %}
-{% block head %}
-    {{ super() }}
-    <script type=text/javascript>
-        /*$(document).ready(function(){
-            $('#category_name').click(function(){
-                var jCatName = $('#category_name').data()
-                var showData = $('#show-data');
-
-                $.getJSON('/category/%s' % jCatName, function(data){
-                    console.log(data);
-
-                    var items = data.items.map(function (item) {
-                        return item.key + ': ' + item.value;
-                    });
-
-                    showData.empty()
-
-                    if(items.length){
-                        var content = '<li>' + items.join('</li><li>') + '</li>';
-                        var list = $('<ul />').html(content);
-                        showData.append(list);
-
-                    };
-                });
-                showData.text('Loading json Data.');
-            });
-        });*/
-    </script>
-{% endblock %}
 
 {% block content %}
 {% include "header.html" %}
