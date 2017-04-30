@@ -260,39 +260,57 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+# URL to clear the login session for testing
 @app.route('/clearSession')
 def clearSession():
   login_session.clear()
   return "Session Cleared"
 
+# Page to handle navigation errors
+@app.route('/error')
+def exceptionError():
+    return render_template('exception.html')
+
 # JSON API'S to view Category Information
 @app.route('/category/<int:category_id>/JSON')
 def categoryJSON(category_id):
-    category = session.query(Category).filter_by(id=category_id).one()
-    items = session.query(Item).filter_by(category_id=category_id).all()
-    return jsonify(Items=[i.serialize for i in items])
+    try:
+        category = session.query(Category).filter_by(id=category_id).one()
+        items = session.query(Item).filter_by(category_id=category_id).all()
+        return jsonify(Items=[i.serialize for i in items])
+    except:
+        return render_template('exception.html')
 
 @app.route('/category/<int:category_id>/<int:item_id>/JSON')
 def itemJSON(category_id, item_id):
-    category_item = session.query(Item).filter_by(id=item_id).one()
-    return jsonify(category_item=category_item.serialize)
+    try:
+        category_item = session.query(Item).filter_by(id=item_id).one()
+        return jsonify(category_item=category_item.serialize)
+    except:
+        return render_template('exception.html')
 
 @app.route('/category/JSON')
 def categoriesJSON():
-    categories = session.query(Category).all()
-    return jsonify(categories=[c.serialize for c in categories])
+    try:
+        categories = session.query(Category).all()
+        return jsonify(categories=[c.serialize for c in categories])
+    except:
+        return render_template('exception.html')
 
 # Show all categories
 @app.route('/')
 @app.route('/category/')
 def showCategories():
-    categories = session.query(Category).order_by(asc(Category.name))
-    latest_items = session.query(Item).order_by(desc(Item.id)).limit(10)
-    users = session.query(User).all()
-    if 'username' not in login_session:
-        return render_template('publicIndex.html', categories=categories, item=latest_items)
-    else:
-        return render_template('index.html', categories=categories, item=latest_items, users=users)
+    try:
+        categories = session.query(Category).order_by(asc(Category.name))
+        latest_items = session.query(Item).order_by(desc(Item.id)).limit(10)
+        users = session.query(User).all()
+        if 'username' not in login_session:
+            return render_template('publicIndex.html', categories=categories, item=latest_items)
+        else:
+            return render_template('index.html', categories=categories, item=latest_items, users=users)
+    except:
+        return render_template('exception.html')
 
 # Add a new category
 @app.route('/category/new', methods=['GET', 'POST'])
@@ -300,114 +318,138 @@ def addCategory():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
-        commitSession(newCategory)
-        displayCategory = session.query(Category).order_by(Category.id.desc()).first()
-        return render_template('newCategory.html', newCategory=displayCategory.name)
+        try:
+            newCategory = Category(name=request.form['name'], user_id=login_session['user_id'])
+            commitSession(newCategory)
+            displayCategory = session.query(Category).order_by(Category.id.desc()).first()
+            return render_template('newCategory.html', newCategory=displayCategory.name)
+        except:
+            return render_template('exception.html')
     else:
         return render_template('newCategory.html')
 
 # Edit a category
 @app.route('/category/<int:category_id>/edit', methods=['GET', 'POST'])
 def editCategory(category_id):
-    
-    editedCategory = session.query(Category).filter_by(id=category_id).one()
-    print str(editedCategory.user_id)
-    print login_session['user_id']
-    if 'username' not in login_session:
-        return redirect('/login')
-    if editedCategory.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to edit this category. Please create your own category in order to edit.');}</script><body onload='myFunction()''>"
-    if request.method == "POST":
-        editItem = session.query(Category).filter_by(id=category_id).first()
-        editItem.name = request.form['name']
-        flash('Category updated to new name, %s' % editItem.name)
-        commitSession(editItem)
-        return redirect(url_for('showCategories'))
-    else:
-        return render_template('editCategory.html', category_id=category_id)
+    try:
+        editedCategory = session.query(Category).filter_by(id=category_id).one()
+        if 'username' not in login_session:
+            return redirect('/login')
+        if editedCategory.user_id != login_session['user_id']:
+            return "<script>function myFunction() {alert('You are not authorized to edit this category. Please create your own category in order to edit.');}</script><body onload='myFunction()''>"
+        if request.method == "POST":
+            editItem = session.query(Category).filter_by(id=category_id).first()
+            editItem.name = request.form['name']
+            flash('Category updated to new name, %s' % editItem.name)
+            commitSession(editItem)
+            return redirect(url_for('showCategories'))
+        else:
+            return render_template('editCategory.html', category_id=category_id)
+    except:
+        return render_template('exception.html')
 
 # Delete a category
 @app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
 def delCategory(category_id):
-    catToDel = session.query(Category).filter_by(id=category_id).one()
-    if 'username' not in login_session:
-        return redirect('/login')
-    if catToDel.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorized to delete this category. Please create your own category in order to delete.');}</script><body onload='myFunction()''>"
-    if request.method == "POST":
-        session.delete(catToDel)
-        flash('%s successfully deleted' % catToDel.name)
-        session.commit()
-        return redirect(url_for('showCategories'))
-    else:
-        return render_template('delCategory.html', category_id=category_id)
+    try:
+        catToDel = session.query(Category).filter_by(id=category_id).one()
+        if 'username' not in login_session:
+            return redirect('/login')
+        if catToDel.user_id != login_session['user_id']:
+            return "<script>function myFunction() {alert('You are not authorized to delete this category. Please create your own category in order to delete.');}</script><body onload='myFunction()''>"
+        if request.method == "POST":
+            session.delete(catToDel)
+            flash('%s successfully deleted' % catToDel.name)
+            session.commit()
+            return redirect(url_for('showCategories'))
+        else:
+            return render_template('delCategory.html', category_id=category_id)
+    except:
+        return render_template('exception.html')
 
 # Show all items in category
 @app.route('/category/<int:category_id>/')
 def showCategoryItems(category_id):
-    items = session.query(Item).filter_by(category_id=category_id).all()
-    categories = session.query(Category).order_by(asc(Category.name))
-    def data_transmitter():
-        catItem = []
-        for item in items:
-            catItem.append(item)
-        return catItem
-    data = data_transmitter()
-    if 'username' not in login_session:
-        return render_template('publicCategories.html', categories=categories, item=data)
-    else:
-        return render_template('categories.html', categories=categories, item=data)
+    try:
+        items = session.query(Item).filter_by(category_id=category_id).all()
+        categories = session.query(Category).order_by(asc(Category.name))
+        def data_transmitter():
+            catItem = []
+            for item in items:
+                catItem.append(item)
+            return catItem
+        data = data_transmitter()
+        if 'username' not in login_session:
+            return render_template('publicCategories.html', categories=categories, item=data)
+        else:
+            return render_template('categories.html', categories=categories, item=data)
+    except:
+        return render_template('exception.html')
 
 # Add a new Item
 @app.route('/category/<int:category_id>/new', methods=['GET','POST'])
 def addItem(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
-    if request.method == 'POST':
-        newItem = Item(name=request.form['name'], description=request.form['description'],
-            price=request.form['price'], category_id=category_id)
-        commitSession(newItem)
-        displayItem = session.query(Item).order_by(Item.id.desc()).first()
-        return render_template('newItem.html', category_id=category_id, newItem=displayItem.name)
-    else:
-        return render_template('newItem.html', category_id=category_id)
-
+    try:
+        if 'username' not in login_session:
+            return redirect('/login')
+        if request.method == 'POST':
+            newItem = Item(name=request.form['name'], description=request.form['description'],
+                price=request.form['price'], category_id=category_id)
+            commitSession(newItem)
+            displayItem = session.query(Item).order_by(Item.id.desc()).first()
+            return render_template('newItem.html', category_id=category_id, newItem=displayItem.name)
+        else:
+            return render_template('newItem.html', category_id=category_id)
+    except:
+        return render_template('exception.html')
 
 # View Item Details
 @app.route('/category/<int:category_id>/<int:item_id>')
 def showItem(category_id, item_id):
-    itemDetails = session.query(Item).filter_by(id=item_id).one()
-    return render_template('itemDetails.html', category_id=category_id, item_id=item_id, 
-        item_details=itemDetails)
+    try:
+        itemDetails = session.query(Item).filter_by(id=item_id).one()
+        return render_template('itemDetails.html', category_id=category_id, item_id=item_id, 
+            item_details=itemDetails)
+    except:
+        return render_template('exception.html')
 
 # Edit a category item
 @app.route('/category/<int:category_id>/<int:item_id>/edit', methods=['GET', 'POST'])
 def editCategoryItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect('/login')
-    if request.method == "POST":
-        itemToEdit = session.query(Item).filter_by(id=item_id).one()
-        itemToEdit.name = request.form['name']
-        itemToEdit.price = request.form['price']
-        itemToEdit.description = request.form['description']
-        commitSession(itemToEdit)
-        return redirect(url_for('showCategories'))
-    else:
-        return render_template('editItem.html', category_id=category_id, item_id=item_id)
+    try:
+        if 'username' not in login_session:
+            return redirect('/login')
+        if request.method == "POST":
+            try:
+                itemToEdit = session.query(Item).filter_by(id=item_id).one()
+                itemToEdit.name = request.form['name']
+                itemToEdit.price = request.form['price']
+                itemToEdit.description = request.form['description']
+                commitSession(itemToEdit)
+                return redirect(url_for('showCategories'))
+            except:
+                return render_template('exception.html')
+        else:
+            return render_template('editItem.html', category_id=category_id, item_id=item_id)
+
+    except:
+        return render_template('exception.html')
 
 # Delete a category item
 @app.route('/category/<int:category_id>/<int:item_id>/delete', methods=['GET', 'POST'])
 def delCategoryItem(category_id, item_id):
-    if 'username' not in login_session:
-        return redirect('/login')
-    if request.method == "POST":
-        itemToDel = session.query(Item).filter_by(id=item_id).one()
-        session.delete(itemToDel)
-        session.commit()
-        return redirect(url_for('showCategoryItems', category_id=category_id))
-    else:
-        return render_template('delItem.html', category_id=category_id, item_id=item_id)
+    try:
+        if 'username' not in login_session:
+            return redirect('/login')
+        if request.method == "POST":
+            itemToDel = session.query(Item).filter_by(id=item_id).one()
+            session.delete(itemToDel)
+            session.commit()
+            return redirect(url_for('showCategoryItems', category_id=category_id))
+        else:
+            return render_template('delItem.html', category_id=category_id, item_id=item_id)
+    except:
+        return render_template('exception.html')
 
 # Disconnect based on provider
 @app.route('/disconnect')

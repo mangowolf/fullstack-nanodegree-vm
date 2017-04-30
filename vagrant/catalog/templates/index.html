@@ -35,12 +35,8 @@
                         Delete
                     </a>
                 </label>
-                {{category.user_id}}
             {% endfor %}
         </div>
-        {% for user in users %}
-            {{user.id}}, {{user.name}}
-        {% endfor %}
         <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
             <h3>Latest Items </h3>
             {% for catItem in item %}
